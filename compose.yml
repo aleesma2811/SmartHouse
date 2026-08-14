@@ -1,0 +1,32 @@
+services:
+  # front:
+  #   build:
+  #     context: ./front/
+  #     # dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  back:
+    build:
+      context: ./back/
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    ports:
+      - "4000:4000"
+    depends_on:
+      - "db"
+  db:
+    image: postgres:18.4-alpine3.24
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
