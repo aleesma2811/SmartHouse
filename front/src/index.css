@@ -1,0 +1,85 @@
+:root {
+  color-scheme: light;
+
+  --color-bg: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+
+  --color-wall: #94a3b8;
+  --color-wall-dark: #475569;
+
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+
+  --color-primary: #6366f1;
+  --color-primary-dark: #4f46e5;
+  --color-primary-soft: #eef2ff;
+
+  --color-danger: #ef4444;
+  --color-danger-soft: #fef2f2;
+
+  --color-on: #16a34a;
+  --color-on-soft: #f0fdf4;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+}
+
+/* Subtle, distinct floor tints assigned per room */
+:root {
+  --floor-0: #eef2ff;
+  --floor-1: #ecfdf5;
+  --floor-2: #fff7ed;
+  --floor-3: #fdf4ff;
+  --floor-4: #f0f9ff;
+  --floor-5: #fefce8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}

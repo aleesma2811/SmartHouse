@@ -1,0 +1,51 @@
+.floor-plan {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.floor-plan__floor--0 { fill: var(--floor-0); }
+.floor-plan__floor--1 { fill: var(--floor-1); }
+.floor-plan__floor--2 { fill: var(--floor-2); }
+.floor-plan__floor--3 { fill: var(--floor-3); }
+.floor-plan__floor--4 { fill: var(--floor-4); }
+.floor-plan__floor--5 { fill: var(--floor-5); }
+
+.floor-plan__wall {
+  stroke: var(--color-wall-dark);
+  stroke-width: 5;
+  stroke-linecap: square;
+}
+
+.floor-plan__window {
+  stroke: var(--color-wall);
+  stroke-width: 2.5;
+}
+
+.floor-plan__door {
+  stroke: var(--color-wall);
+  stroke-width: 1.5;
+}
+
+.floor-plan__door-arc {
+  fill: none;
+  stroke: var(--color-wall);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.floor-plan__plug {
+  fill: #cbd5e1;
+  stroke: var(--color-wall-dark);
+  stroke-width: 0.75;
+}
+
+.floor-plan__plug--on {
+  fill: var(--color-on);
+  stroke: #15803d;
+}
+
+.floor-plan__plug-prong {
+  stroke: var(--color-wall-dark);
+  stroke-width: 0.75;
+}
