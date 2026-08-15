@@ -68,3 +68,30 @@ func DeletePlugsHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Plug deleted"))
 }
+
+func UpdatePlugHandler(w http.ResponseWriter, r *http.Request) {
+	var plug models.Plug
+	params := mux.Vars(r)
+	fmt.Println("ID a actualizar", params["id"])
+
+	db.DB.First(&plug, params["id"])
+
+	if plug.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Plug not found, invalid ID"))
+		return
+	}
+
+	var updatedData models.Plug
+	if err := json.NewDecoder(r.Body).Decode(&updatedData); err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("PInvalid JSON"))
+		return
+	}
+
+	db.DB.Model(&plug).Updates(updatedData) // Aplicar cambios
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(&plug)
+
+}

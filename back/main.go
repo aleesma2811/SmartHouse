@@ -27,6 +27,7 @@ func main() {
 	r.HandleFunc("/plugs", routes.GetPlugsHandler).Methods("GET")
 	r.HandleFunc("/plugs/{id}", routes.GetPlugHandler).Methods("GET")
 	r.HandleFunc("/plugs", routes.CreatePlugHandler).Methods("POST")
+	r.HandleFunc("/plugs/{id}", routes.UpdatePlugHandler).Methods("PUT")
 	r.HandleFunc("/plugs/{id}", routes.DeletePlugsHandler).Methods("DELETE")
 
 	http.ListenAndServe(":4000", r)
