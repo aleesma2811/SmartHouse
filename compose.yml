@@ -1,10 +1,12 @@
 services:
-  # front:
-  #   build:
-  #     context: ./front/
-  #     # dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:3000"
+  front:
+    build:
+      context: ./front/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - "back"
   back:
     build:
       context: ./back/
