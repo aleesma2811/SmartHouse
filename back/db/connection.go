@@ -23,13 +23,8 @@ func DBConnection() {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to ping database", err)
 	} else {
 		log.Println("DB Connected")
 	}
 }
-
-// func getEnv(key string) string {
-// 	value := os.Getenv(key)
-// 	return value
-// }
