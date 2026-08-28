@@ -2,96 +2,95 @@ package routes
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
-	"github.com/back/db"
 	"github.com/back/models"
+	"github.com/back/repository"
 	"github.com/gorilla/mux"
 )
 
-func GetPlugsHandler(w http.ResponseWriter, r *http.Request) {
-	var plugs []models.Plug
-	db.DB.Find(&plugs) // Hacer consulta
-	json.NewEncoder(w).Encode(&plugs)
-	w.Write([]byte("Get plugs"))
-
+type PlugHandler struct {
+	repo repository.PlugRepository
 }
 
-func GetPlugHandler(w http.ResponseWriter, r *http.Request) {
-	var plug models.Plug
-	params := mux.Vars(r)
+func NewPlugHandler(repo repository.PlugRepository) *PlugHandler {
+	return &PlugHandler{repo: repo}
+}
 
-	db.DB.First(&plug, params["id"])
-
-	if plug.ID == 0 { // Si no existe el room
-		w.WriteHeader(http.StatusNotFound) // Error 404
-		w.Write([]byte("Room not found"))
+func (h *PlugHandler) GetPlugsHandler(w http.ResponseWriter, r *http.Request) {
+	plugs, err := h.repo.GetAll()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
-
-	json.NewEncoder(w).Encode(&plug)
+	json.NewEncoder(w).Encode(&plugs)
 }
 
-func CreatePlugHandler(w http.ResponseWriter, r *http.Request) {
+func (h *PlugHandler) GetPlugHandler(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	plug, err := h.repo.GetByID(params["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Plug not found"))
+		return
+	}
+	json.NewEncoder(w).Encode(plug)
+}
+
+func (h *PlugHandler) PostPlugsHandler(w http.ResponseWriter, r *http.Request) {
 	var plug models.Plug
 
-	json.NewDecoder(r.Body).Decode(&plug)
-
-	createdPlug := db.DB.Create(&plug)
-	err := createdPlug.Error
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest) // Error 404
+	if err := json.NewDecoder(r.Body).Decode(&plug); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return
 	}
 
-	json.NewEncoder(w).Encode(&plug)
+	if err := h.repo.Create(&plug); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	json.NewEncoder(w).Encode(plug)
 }
 
-func DeletePlugsHandler(w http.ResponseWriter, r *http.Request) {
-	var plug models.Plug
+func (h *PlugHandler) UpdatePlugHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	fmt.Println("ID recibido:", params["id"])
-
-	db.DB.First(&plug, params["id"])
-	fmt.Println("Plug encontrado:", plug)
-
-	if plug.ID == 0 {
+	plug, err := h.repo.GetByID(params["id"])
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("Plug not found, invalid ID"))
+		w.Write([]byte("Plug not found"))
 		return
 	}
 
-	db.DB.Unscoped().Delete(&plug)
+	if err := json.NewDecoder(r.Body).Decode(plug); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	if err := h.repo.Update(plug); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+}
+
+func (h *PlugHandler) DeletePlugsHandler(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	if _, err := h.repo.GetByID(params["id"]); err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	if err := h.repo.Delete(params["id"]); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Plug deleted"))
-}
-
-func UpdatePlugHandler(w http.ResponseWriter, r *http.Request) {
-	var plug models.Plug
-	params := mux.Vars(r)
-	fmt.Println("ID a actualizar", params["id"])
-
-	db.DB.First(&plug, params["id"])
-
-	if plug.ID == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("Plug not found, invalid ID"))
-		return
-	}
-
-	var updatedData models.Plug
-	if err := json.NewDecoder(r.Body).Decode(&updatedData); err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("PInvalid JSON"))
-		return
-	}
-
-	db.DB.Model(&plug).Updates(updatedData) // Aplicar cambios
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(&plug)
-
 }
