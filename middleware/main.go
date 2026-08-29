@@ -19,6 +19,20 @@ var routes = []Route{
 	{Prefix: "/plugs", Target: "http://localhost:4000"},
 }
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	proxies := make(map[string]*httputil.ReverseProxy)
 
@@ -30,7 +44,7 @@ func main() {
 		proxies[route.Prefix] = httputil.NewSingleHostReverseProxy(target) // Crea un objeto proxy
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mainHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		for _, route := range routes {
 			if strings.HasPrefix(r.URL.Path, route.Prefix) {
 				proxies[route.Prefix].ServeHTTP(w, r)
@@ -41,5 +55,5 @@ func main() {
 	})
 
 	log.Println("Gateway escuchando en :8000")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Fatal(http.ListenAndServe(":8000", corsMiddleware(mainHandler)))
 }
