@@ -16,8 +16,10 @@ async function parseBody(text) {
   }
 }
 
+const API_BASE = "http://localhost:8000";
+
 export async function request(path, options = {}) {
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
