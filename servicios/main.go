@@ -13,22 +13,22 @@ import (
 func main() {
 	db.DBConnection()
 
-	db.DB.AutoMigrate(models.Plug{})
+	db.DB.AutoMigrate(models.Servicio{})
 
 	// Inyección de dependencias
-	plugRepo := repository.NewPlugRepository(db.DB)
-	plugHandler := routes.NewPlugHandler(plugRepo)
+	servicioRepo := repository.NewServicioRepository(db.DB)
+	servicioHandler := routes.NewServicioHandler(servicioRepo)
 
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", routes.HomeHandler)
 
 	// Plugs routes
-	r.HandleFunc("/plugs", plugHandler.GetPlugsHandler).Methods("GET")
-	r.HandleFunc("/plugs/{id}", plugHandler.GetPlugHandler).Methods("GET")
-	r.HandleFunc("/plugs", plugHandler.PostPlugsHandler).Methods("POST")
-	r.HandleFunc("/plugs/{id}", plugHandler.UpdatePlugHandler).Methods("PUT")
-	r.HandleFunc("/plugs/{id}", plugHandler.DeletePlugsHandler).Methods("DELETE")
+	r.HandleFunc("/servicios", servicioHandler.GetServiciosHandler).Methods("GET")
+	r.HandleFunc("/servicios/{id}", servicioHandler.GetServicioHandler).Methods("GET")
+	r.HandleFunc("/servicios", servicioHandler.PostServiciosHandler).Methods("POST")
+	r.HandleFunc("/servicios/{id}", servicioHandler.UpdateServicioHandler).Methods("PUT")
+	r.HandleFunc("/servicios/{id}", servicioHandler.DeleteServiciosHandler).Methods("DELETE")
 
 	http.ListenAndServe(":4001", r)
 }
