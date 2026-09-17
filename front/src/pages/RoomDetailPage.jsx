@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRoom, deleteRoom } from "../api/rooms";
-import { createPlug, updatePlug, deletePlug } from "../api/plugs";
+import { getPlugs, createPlug, updatePlug, deletePlug } from "../api/plugs";
 import RoomFloorPlan from "../components/rooms/RoomFloorPlan";
 import PlugList from "../components/plugs/PlugList";
 import PlugForm from "../components/plugs/PlugForm";
@@ -13,6 +13,7 @@ export default function RoomDetailPage() {
   const navigate = useNavigate();
 
   const [room, setRoom] = useState(null);
+  const [plugs, setPlugs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingPlug, setEditingPlug] = useState(null);
@@ -22,8 +23,9 @@ export default function RoomDetailPage() {
     setLoading(true);
     setError("");
     try {
-      const data = await getRoom(id);
-      setRoom(data);
+      const [roomData, plugsData] = await Promise.all([getRoom(id), getPlugs(id)]);
+      setRoom(roomData);
+      setPlugs(plugsData || []);
     } catch (err) {
       setError(err.message || "No se pudo cargar la habitación");
     } finally {
@@ -46,11 +48,11 @@ export default function RoomDetailPage() {
     setShowForm(true);
   }
 
-  async function handleSubmitPlug({ name, kwhConsump, on }) {
+  async function handleSubmitPlug({ name, tipo, kwhConsump, on }) {
     if (editingPlug) {
-      await updatePlug(editingPlug.ID, { name, kwhConsump, on });
+      await updatePlug(editingPlug.ID, { name, tipo, kwhConsump, on });
     } else {
-      await createPlug({ name, kwhConsump, on, roomId: id });
+      await createPlug({ name, tipo, kwhConsump, on, roomId: id });
     }
     setShowForm(false);
     setEditingPlug(null);
@@ -61,22 +63,23 @@ export default function RoomDetailPage() {
     try {
       await updatePlug(plug.ID, {
         name: plug.Name,
-        kwhConsump: plug.KwhConsump,
+        tipo: plug.Tipo,
+        kwhConsump: plug.Consumo,
         on: !plug.On,
       });
       await loadRoom();
     } catch (err) {
-      alert(err.message || "No se pudo actualizar el enchufe");
+      alert(err.message || "No se pudo actualizar el servicio");
     }
   }
 
   async function handleDeletePlug(plug) {
-    if (!window.confirm(`¿Eliminar el enchufe "${plug.Name}"?`)) return;
+    if (!window.confirm(`¿Eliminar el servicio "${plug.Name}"?`)) return;
     try {
       await deletePlug(plug.ID);
       await loadRoom();
     } catch (err) {
-      alert(err.message || "No se pudo eliminar el enchufe");
+      alert(err.message || "No se pudo eliminar el servicio");
     }
   }
 
@@ -93,8 +96,6 @@ export default function RoomDetailPage() {
   if (loading) return <p className="room-detail__status">Cargando...</p>;
   if (error) return <p className="room-detail__status room-detail__status--error">{error}</p>;
   if (!room) return null;
-
-  const plugs = room.Plugs || [];
 
   return (
     <div className="room-detail">
@@ -116,9 +117,9 @@ export default function RoomDetailPage() {
 
         <div className="room-detail__plugs">
           <div className="room-detail__plugs-header">
-            <h2>Enchufes</h2>
+            <h2>Servicios</h2>
             <button type="button" className="btn btn-primary" onClick={openCreateForm}>
-              + Añadir enchufe
+              + Añadir servicio
             </button>
           </div>
 
@@ -133,7 +134,7 @@ export default function RoomDetailPage() {
 
       {showForm && (
         <Modal
-          title={editingPlug ? "Editar enchufe" : "Nuevo enchufe"}
+          title={editingPlug ? "Editar servicio" : "Nuevo servicio"}
           onClose={() => setShowForm(false)}
         >
           <PlugForm

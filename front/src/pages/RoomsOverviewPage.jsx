@@ -41,7 +41,7 @@ export default function RoomsOverviewPage() {
     const plugCount = plugs.filter((p) => p.RoomID === room.ID).length;
     const warning =
       plugCount > 0
-        ? `"${room.Name}" tiene ${plugCount} enchufe(s) registrados. ¿Eliminar la habitación de todas formas?`
+        ? `"${room.Name}" tiene ${plugCount} servicio(s) registrados. ¿Eliminar la habitación de todas formas?`
         : `¿Eliminar la habitación "${room.Name}"?`;
     if (!window.confirm(warning)) return;
 
@@ -59,7 +59,7 @@ export default function RoomsOverviewPage() {
         <div>
           <h1>Habitaciones</h1>
           <p className="rooms-page__subtitle">
-            Plano general de la casa y sus enchufes inteligentes
+            Plano general de la casa y sus servicios inteligentes
           </p>
         </div>
         <button type="button" className="btn btn-primary" onClick={() => setShowForm(true)}>

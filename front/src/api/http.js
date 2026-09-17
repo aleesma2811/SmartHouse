@@ -1,6 +1,6 @@
 // Thin fetch wrapper around the Go backend.
 //
-// Two of the backend's list handlers (GET /rooms, GET /plugs) call
+// Two of the backend's list handlers (GET /rooms, GET /servicios) call
 // json.NewEncoder(w).Encode(...) and then write a trailing plain-text
 // string ("Get rooms" / "Get plugs") straight after it, so the raw
 // response body is JSON immediately followed by garbage text. The Go

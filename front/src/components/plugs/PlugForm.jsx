@@ -4,7 +4,8 @@ import "../common/forms.css";
 export default function PlugForm({ initialPlug, onSubmit, onCancel }) {
   const isEditing = Boolean(initialPlug);
   const [name, setName] = useState(initialPlug?.Name ?? "");
-  const [kwhConsump, setKwhConsump] = useState(initialPlug?.KwhConsump ?? "");
+  const [tipo, setTipo] = useState(initialPlug?.Tipo ?? "luz");
+  const [kwhConsump, setKwhConsump] = useState(initialPlug?.Consumo ?? "");
   const [on, setOn] = useState(initialPlug?.On ?? false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -18,9 +19,9 @@ export default function PlugForm({ initialPlug, onSubmit, onCancel }) {
     setSaving(true);
     setError("");
     try {
-      await onSubmit({ name: name.trim(), kwhConsump, on });
+      await onSubmit({ name: name.trim(), tipo, kwhConsump, on });
     } catch (err) {
-      setError(err.message || "No se pudo guardar el enchufe");
+      setError(err.message || "No se pudo guardar el servicio");
       setSaving(false);
     }
   }
@@ -39,6 +40,15 @@ export default function PlugForm({ initialPlug, onSubmit, onCancel }) {
           placeholder="Ej. Lámpara de mesa"
           autoFocus
         />
+      </div>
+
+      <div className="field">
+        <label htmlFor="plug-tipo">Tipo de servicio</label>
+        <select id="plug-tipo" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+          <option value="luz">Luz</option>
+          <option value="agua">Agua</option>
+          <option value="gas">Gas</option>
+        </select>
       </div>
 
       <div className="field">
@@ -69,7 +79,7 @@ export default function PlugForm({ initialPlug, onSubmit, onCancel }) {
           Cancelar
         </button>
         <button type="submit" className="btn btn-primary" disabled={saving}>
-          {saving ? "Guardando..." : isEditing ? "Guardar cambios" : "Añadir enchufe"}
+          {saving ? "Guardando..." : isEditing ? "Guardar cambios" : "Añadir servicio"}
         </button>
       </div>
     </form>

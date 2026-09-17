@@ -17,7 +17,7 @@ export default function RoomCard({ room, plugs, onDelete }) {
             {room.Name}
           </Link>
           <p className="room-card__meta">
-            {plugs.length} enchufe{plugs.length === 1 ? "" : "s"}
+            {plugs.length} servicio{plugs.length === 1 ? "" : "s"}
             {onCount > 0 ? ` · ${onCount} encendido${onCount === 1 ? "" : "s"}` : ""}
           </p>
         </div>

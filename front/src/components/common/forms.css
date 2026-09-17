@@ -12,7 +12,8 @@
 }
 
 .field input[type="text"],
-.field input[type="number"] {
+.field input[type="number"],
+.field select {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 0.55rem 0.7rem;
@@ -21,7 +22,8 @@
   background: var(--color-bg);
 }
 
-.field input:focus {
+.field input:focus,
+.field select:focus {
   outline: 2px solid var(--color-primary);
   outline-offset: 1px;
 }

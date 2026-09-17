@@ -2,7 +2,7 @@ import "./PlugList.css";
 
 export default function PlugList({ plugs, onToggle, onEdit, onDelete }) {
   if (plugs.length === 0) {
-    return <p className="plug-list__empty">Todavía no hay enchufes en esta habitación.</p>;
+    return <p className="plug-list__empty">Todavía no hay servicios en esta habitación.</p>;
   }
 
   return (
@@ -22,7 +22,8 @@ export default function PlugList({ plugs, onToggle, onEdit, onDelete }) {
           <div className="plug-list__info">
             <span className="plug-list__name">{plug.Name}</span>
             <span className="plug-list__meta">
-              {plug.KwhConsump ?? 0} kWh · {plug.On ? "Encendido" : "Apagado"}
+              {plug.Tipo ? `${plug.Tipo} · ` : ""}
+              {plug.Consumo ?? 0} kWh · {plug.On ? "Encendido" : "Apagado"}
             </span>
           </div>
 
