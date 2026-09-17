@@ -7,6 +7,17 @@ services:
       - "3000:3000"
     depends_on:
       - "back"
+
+  middleware:
+    build:
+      context: ./middleware/
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - "back"
+      - "servicios"
+
   back:
     build:
       context: ./back/
@@ -21,6 +32,22 @@ services:
       - "4000:4000"
     depends_on:
       - "db"
+
+  servicios:
+    build:
+      context: ./servicios/
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    ports:
+      - "4001:4001"
+    depends_on:
+      - "db"
+
   db:
     image: postgres:18.4-alpine3.24
     restart: always
@@ -32,3 +59,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+
+  # volumes:
+  #   pgdata:
+
