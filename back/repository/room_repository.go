@@ -24,13 +24,13 @@ func NewRoomRepository(db *gorm.DB) RoomRepository {
 // Receiver (this/self de gormRoomRepository)
 func (repo *gormRoomRepository) GetAll() ([]models.Room, error) {
 	var rooms []models.Room
-	err := repo.db.Preload("Plugs").Find(&rooms).Error
+	err := repo.db.Find(&rooms).Error
 	return rooms, err
 }
 
 func (repo *gormRoomRepository) GetByID(id string) (*models.Room, error) {
 	var room models.Room
-	err := repo.db.Preload("Plugs").First(&room, id).Error // Trae un solo registro filtrado por el ID
+	err := repo.db.First(&room, id).Error // Trae un solo registro filtrado por el ID
 
 	if err != nil {
 		return nil, err
@@ -43,5 +43,5 @@ func (repo *gormRoomRepository) Create(room *models.Room) error {
 }
 
 func (repo *gormRoomRepository) Delete(id string) error {
-	return repo.db.Unscoped().Delete(&models.Room{}, id).Error // Struct vacía, no carga los datos deñ room, únicamente el ID
+	return repo.db.Unscoped().Delete(&models.Room{}, id).Error // Struct vacía, no carga los datos del room, únicamente el ID
 }
