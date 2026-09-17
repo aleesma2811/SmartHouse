@@ -70,7 +70,7 @@ func (h *InmuebleHandler) PostInmueblesHandler(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(&inmueble)
 }
 
-func (h *InmuebleHandler) UpdateServicioHandler(w http.ResponseWriter, r *http.Request) {
+func (h *InmuebleHandler) UpdateInmueble(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	inmueble, err := h.repo.GetByID(params["id"])
 	if err != nil {

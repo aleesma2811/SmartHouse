@@ -28,7 +28,7 @@ func main() {
 	r.HandleFunc("/inmuebles", inmuebleHandler.GetInmueblesHandler).Methods("GET")
 	r.HandleFunc("/inmuebles/{id}", inmuebleHandler.GetInmuebleHandler).Methods("GET")
 	r.HandleFunc("/inmuebles", inmuebleHandler.PostInmueblesHandler).Methods("POST")
-	r.HandleFunc("/inmuebles/{id}", inmuebleHandler.UpdateServicioHandler).Methods("PUT")
+	r.HandleFunc("/inmuebles/{id}", inmuebleHandler.UpdateInmueble).Methods("PUT")
 	r.HandleFunc("/inmuebles/{id}", inmuebleHandler.DeleteInmuebleHandler).Methods("DELETE")
 
 	log.Println("Servicio 'inmuebles' escuchando en :4002")
