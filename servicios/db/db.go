@@ -23,8 +23,8 @@ func DBConnection() {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to ping database", err)
+		log.Fatal("Servicios Failed to ping database", err)
 	} else {
-		log.Println("DB Connected")
+		log.Println("DB Connected - Servicios")
 	}
 }
