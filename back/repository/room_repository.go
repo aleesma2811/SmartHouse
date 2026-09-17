@@ -8,6 +8,7 @@ import (
 type RoomRepository interface {
 	GetAll() ([]models.Room, error)
 	GetByID(id string) (*models.Room, error)
+	GetByInmuebleID(inmuebleID string) ([]models.Room, error)
 	Create(room *models.Room) error
 	Delete(id string) error
 }
@@ -25,6 +26,12 @@ func NewRoomRepository(db *gorm.DB) RoomRepository {
 func (repo *gormRoomRepository) GetAll() ([]models.Room, error) {
 	var rooms []models.Room
 	err := repo.db.Find(&rooms).Error
+	return rooms, err
+}
+
+func (repo *gormRoomRepository) GetByInmuebleID(inmuebleID string) ([]models.Room, error) {
+	var rooms []models.Room
+	err := repo.db.Where("inmueble_id = ?", inmuebleID).Find(&rooms).Error
 	return rooms, err
 }
 

@@ -19,7 +19,17 @@ func NewRoomHandler(repo repository.RoomRepository) *RoomHandler {
 }
 
 func (h *RoomHandler) GetRoomsHandler(w http.ResponseWriter, r *http.Request) {
-	rooms, err := h.repo.GetAll()
+	inmuebleID := r.URL.Query().Get("inmuebleId") // Da parámetros del query '/back?inmuebleId=10', y se extrae roomId
+
+	var rooms []models.Room
+	var err error
+
+	if inmuebleID != "" {
+		rooms, err = h.repo.GetByInmuebleID(inmuebleID)
+	} else {
+		rooms, err = h.repo.GetAll()
+	}
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError) // 500 Internal Server Error
 		w.Write([]byte(err.Error()))
