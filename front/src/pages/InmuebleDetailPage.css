@@ -1,0 +1,87 @@
+.inmueble-detail {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 3rem;
+  width: 100%;
+}
+
+.inmueble-detail__status {
+  text-align: center;
+  padding: 3rem 0;
+  color: var(--color-text-muted);
+}
+
+.inmueble-detail__status--error {
+  color: var(--color-danger);
+}
+
+.inmueble-detail__back {
+  display: inline-block;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.inmueble-detail__back:hover {
+  color: var(--color-text);
+}
+
+.inmueble-detail__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.inmueble-detail__header-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.inmueble-detail__header h1 {
+  font-size: 1.5rem;
+  margin-top: 0.3rem;
+}
+
+.inmueble-detail__subtitle {
+  margin-top: 0.3rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.inmueble-detail__badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+
+.inmueble-detail__badge--departamento {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.inmueble-detail__rooms-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.inmueble-detail__rooms-header h2 {
+  font-size: 1.1rem;
+}
+
+.inmueble-detail__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+}

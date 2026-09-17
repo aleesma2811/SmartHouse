@@ -2,18 +2,18 @@ import { Link } from "react-router-dom";
 import RoomFloorPlan from "./RoomFloorPlan";
 import "./RoomCard.css";
 
-export default function RoomCard({ room, plugs, onDelete }) {
+export default function RoomCard({ room, plugs, onDelete, linkTo = `/room/${room.ID}` }) {
   const onCount = plugs.filter((p) => p.On).length;
 
   return (
     <div className="room-card">
-      <Link to={`/room/${room.ID}`} className="room-card__plan">
+      <Link to={linkTo} className="room-card__plan">
         <RoomFloorPlan plugs={plugs} colorSeed={room.ID} label={room.Name} />
       </Link>
 
       <div className="room-card__footer">
         <div>
-          <Link to={`/room/${room.ID}`} className="room-card__name">
+          <Link to={linkTo} className="room-card__name">
             {room.Name}
           </Link>
           <p className="room-card__meta">

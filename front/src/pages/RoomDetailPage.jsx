@@ -9,7 +9,7 @@ import Modal from "../components/common/Modal";
 import "./RoomDetailPage.css";
 
 export default function RoomDetailPage() {
-  const { id } = useParams();
+  const { inmuebleId, id } = useParams();
   const navigate = useNavigate();
 
   const [room, setRoom] = useState(null);
@@ -87,7 +87,7 @@ export default function RoomDetailPage() {
     if (!window.confirm(`¿Eliminar la habitación "${room.Name}" y volver al listado?`)) return;
     try {
       await deleteRoom(room.ID);
-      navigate("/");
+      navigate(`/inmueble/${inmuebleId}`);
     } catch (err) {
       alert(err.message || "No se pudo eliminar la habitación");
     }
@@ -99,7 +99,7 @@ export default function RoomDetailPage() {
 
   return (
     <div className="room-detail">
-      <Link to="/" className="room-detail__back">
+      <Link to={`/inmueble/${inmuebleId}`} className="room-detail__back">
         &larr; Todas las habitaciones
       </Link>
 
