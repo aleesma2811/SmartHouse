@@ -15,9 +15,9 @@ type Route struct {
 
 // Tabla de ruteo
 var routes = []Route{
-	{Prefix: "/rooms", Target: "http://back:4000"},
-	{Prefix: "/servicios", Target: "http://servicios:4001"},
-	{Prefix: "/inmuebles", Target: "http://inmuebles:4002"},
+	{Prefix: "/rooms", Target: "http://loadbalancer:9000"},
+	{Prefix: "/servicios", Target: "http://loadbalancer:9000"},
+	{Prefix: "/inmuebles", Target: "http://loadbalancer:9000"},
 }
 
 func corsMiddleware(next http.Handler) http.Handler {

@@ -15,8 +15,18 @@ services:
     ports:
       - "8000:8000"
     depends_on:
+      - "loadbalancer"
+
+  loadbalancer:
+    build:
+      context: ./loadbalancer/
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    depends_on:
       - "back"
       - "servicios"
+      - "inmuebles"
 
   back:
     build:
