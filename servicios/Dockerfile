@@ -10,6 +10,6 @@ RUN go mod download
 
 COPY . .
 
-EXPOSE 4001
+EXPOSE 8000
 
 CMD ["air"]
