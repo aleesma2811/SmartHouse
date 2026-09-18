@@ -6,7 +6,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - "back"
+      - "middleware"
 
   middleware:
     build:
@@ -24,11 +24,14 @@ services:
     ports:
       - "9000:9000"
     depends_on:
-      - "back"
-      - "servicios"
-      - "inmuebles"
+      - "back-1"
+      - "back-2"
+      - "servicios-1"
+      - "servicios-2"
+      - "inmuebles-1"
+      - "inmuebles-2"
 
-  back:
+  back-1: &back-base
     build:
       context: ./back/
       dockerfile: Dockerfile
@@ -38,12 +41,13 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PORT: ${POSTGRES_PORT}
-    ports:
-      - "4000:4000"
     depends_on:
       - "db"
 
-  servicios:
+  back-2:
+    <<: *back-base
+
+  servicios-1: &servicios-base
     build:
       context: ./servicios/
       dockerfile: Dockerfile
@@ -53,12 +57,13 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PORT: ${POSTGRES_PORT}
-    ports:
-      - "4001:4001"
     depends_on:
       - "db"
 
-  inmuebles:
+  servicios-2:
+    <<: *servicios-base
+
+  inmuebles-1: &inmuebles-base
     build:
       context: ./inmuebles/
       dockerfile: Dockerfile
@@ -68,10 +73,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PORT: ${POSTGRES_PORT}
-    ports:
-      - "4002:4002"
     depends_on:
       - "db"
+
+  inmuebles-2: 
+    <<: *inmuebles-base
 
   db:
     image: postgres:18.4-alpine3.24
@@ -84,9 +90,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
+    volumes:
+      - pgdata:/var/lib/postgresql
 
-  # volumes:
-  #   pgdata:
+volumes:
+  pgdata:
 
