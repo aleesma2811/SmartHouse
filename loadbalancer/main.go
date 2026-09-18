@@ -6,36 +6,48 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
+	"sync/atomic"
 )
 
 type Route struct {
-	Prefix string // inicio del path
-	Target string // A donde va la petición
+	Prefix  string   // inicio del path
+	Targets []string // A donde va la petición
+	counter uint64
 }
 
 // Tabla de ruteo
 var routes = []Route{
-	{Prefix: "/rooms", Target: "http://back:4000"},
-	{Prefix: "/servicios", Target: "http://servicios:4001"},
-	{Prefix: "/inmuebles", Target: "http://inmuebles:4002"},
+	{Prefix: "/rooms", Targets: []string{"http://back-1:4000", "http://back-2:4000"}},
+	{Prefix: "/servicios", Targets: []string{"http://servicios-1:4001", "http://servicios-2:4001"}},
+	{Prefix: "/inmuebles", Targets: []string{"http://inmuebles-1:4002", "http://inmuebles-2:4002"}},
+}
+
+func (route *Route) nextTarget() string {
+	n := atomic.AddUint64(&route.counter, 1)
+	index := int(n % uint64(len(route.Targets)))
+	return route.Targets[index]
 }
 
 func main() {
 	proxies := make(map[string]*httputil.ReverseProxy)
 
 	for _, route := range routes {
-		target, err := url.Parse(route.Target) // Convierte la ruta a un objeto *url.URL
-		if err != nil {
-			log.Fatal(err)
+		for _, target := range route.Targets {
+			parsedURL, err := url.Parse(target)
+			if err != nil {
+				log.Fatal(err)
+			}
+			proxies[target] = httputil.NewSingleHostReverseProxy(parsedURL)
 		}
-		proxies[route.Prefix] = httputil.NewSingleHostReverseProxy(target) // Crea un objeto proxy
 	}
 
 	mainHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		for _, route := range routes {
+		for i := range routes {
+			route := &routes[i]
 			if strings.HasPrefix(r.URL.Path, route.Prefix) {
-				log.Printf("LB: %s -> %s", r.URL.Path, route.Prefix)
-				proxies[route.Prefix].ServeHTTP(w, r)
+				target := route.nextTarget()
+				log.Printf("LB: %s -> %s", r.URL.Path, target)
+				proxies[target].ServeHTTP(w, r)
 				return
 			}
 		}
