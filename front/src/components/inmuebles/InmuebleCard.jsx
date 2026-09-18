@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { IconPencil, IconTrash } from "../common/Icons";
 import "./InmuebleCard.css";
 
 const TIPO_LABEL = {
@@ -26,21 +27,21 @@ export default function InmuebleCard({ inmueble, roomCount, onEdit, onDelete }) 
       <div className="inmueble-card__actions">
         <button
           type="button"
-          className="inmueble-card__edit"
+          className="icon-btn"
           title="Editar inmueble"
           aria-label="Editar inmueble"
           onClick={() => onEdit(inmueble)}
         >
-          &#9998;
+          <IconPencil width={15} height={15} />
         </button>
         <button
           type="button"
-          className="inmueble-card__delete"
+          className="icon-btn icon-btn--danger"
           title="Eliminar inmueble"
           aria-label="Eliminar inmueble"
           onClick={() => onDelete(inmueble)}
         >
-          &times;
+          <IconTrash width={15} height={15} />
         </button>
       </div>
     </div>

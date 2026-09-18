@@ -4,6 +4,7 @@ import { getRooms } from "../api/rooms";
 import InmuebleCard from "../components/inmuebles/InmuebleCard";
 import InmuebleForm from "../components/inmuebles/InmuebleForm";
 import Modal from "../components/common/Modal";
+import { IconPlus } from "../components/common/Icons";
 import "./InmueblesPage.css";
 
 export default function InmueblesPage() {
@@ -83,7 +84,7 @@ export default function InmueblesPage() {
           </p>
         </div>
         <button type="button" className="btn btn-primary" onClick={openCreateForm}>
-          + Nuevo inmueble
+          <IconPlus width={15} height={15} /> Nuevo inmueble
         </button>
       </div>
 

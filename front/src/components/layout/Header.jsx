@@ -14,7 +14,7 @@ export default function Header() {
         >
           <path
             d="M12 3 3 10h2v10h5v-6h4v6h5V10h2z"
-            fill="var(--color-primary)"
+            fill="var(--color-luz)"
           />
         </svg>
         <span>SmartHouse</span>

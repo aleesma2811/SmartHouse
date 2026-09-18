@@ -11,7 +11,7 @@
 
 .modal {
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
   width: 100%;
   max-width: 420px;
@@ -26,20 +26,22 @@
 }
 
 .modal__header h2 {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
 }
 
 .modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: transparent;
-  font-size: 1.4rem;
-  line-height: 1;
   cursor: pointer;
   color: var(--color-text-muted);
-  padding: 0.15rem 0.4rem;
-  border-radius: var(--radius-sm);
+  padding: 0.35rem;
+  border-radius: var(--radius-xs);
 }
 
 .modal__close:hover {
-  background: var(--color-bg);
+  background: var(--color-surface-alt);
+  color: var(--color-text);
 }

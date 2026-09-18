@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { getServiceMeta, SERVICE_META } from "./serviceTheme";
 import "../common/forms.css";
+import "./PlugForm.css";
 
 export default function PlugForm({ initialPlug, onSubmit, onCancel }) {
   const isEditing = Boolean(initialPlug);
@@ -9,6 +11,9 @@ export default function PlugForm({ initialPlug, onSubmit, onCancel }) {
   const [on, setOn] = useState(initialPlug?.On ?? false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const meta = getServiceMeta(tipo);
+  const Icon = meta.Icon;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -44,24 +49,47 @@ export default function PlugForm({ initialPlug, onSubmit, onCancel }) {
 
       <div className="field">
         <label htmlFor="plug-tipo">Tipo de servicio</label>
-        <select id="plug-tipo" value={tipo} onChange={(e) => setTipo(e.target.value)}>
-          <option value="luz">Luz</option>
-          <option value="agua">Agua</option>
-          <option value="gas">Gas</option>
-        </select>
+        <div className="plug-form__tipo-picker">
+          {Object.entries(SERVICE_META).map(([value, option]) => {
+            const OptionIcon = option.Icon;
+            const active = value === tipo;
+            return (
+              <button
+                key={value}
+                type="button"
+                className={
+                  active
+                    ? "plug-form__tipo-option plug-form__tipo-option--active"
+                    : "plug-form__tipo-option"
+                }
+                style={{ "--tipo-color": option.color, "--tipo-soft": option.soft }}
+                onClick={() => setTipo(value)}
+                aria-pressed={active}
+              >
+                <OptionIcon width={18} height={18} />
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="field">
-        <label htmlFor="plug-kwh">Consumo (kWh)</label>
-        <input
-          id="plug-kwh"
-          type="number"
-          step="0.01"
-          min="0"
-          value={kwhConsump}
-          onChange={(e) => setKwhConsump(e.target.value)}
-          placeholder="0.00"
-        />
+        <label htmlFor="plug-kwh">
+          Consumo ({meta.unit})
+        </label>
+        <div className="plug-form__consumo">
+          <Icon width={16} height={16} style={{ color: meta.color }} />
+          <input
+            id="plug-kwh"
+            type="number"
+            step="0.01"
+            min="0"
+            value={kwhConsump}
+            onChange={(e) => setKwhConsump(e.target.value)}
+            placeholder={`0.00 ${meta.unit}`}
+          />
+        </div>
       </div>
 
       <div className="field field--checkbox">

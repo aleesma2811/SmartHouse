@@ -1,3 +1,4 @@
+import { IconClose } from "./Icons";
 import "./Modal.css";
 
 export default function Modal({ title, onClose, children }) {
@@ -12,7 +13,7 @@ export default function Modal({ title, onClose, children }) {
             onClick={onClose}
             aria-label="Cerrar"
           >
-            &times;
+            <IconClose width={18} height={18} />
           </button>
         </div>
         <div className="modal__body">{children}</div>

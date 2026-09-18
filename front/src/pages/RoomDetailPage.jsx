@@ -3,9 +3,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRoom, deleteRoom } from "../api/rooms";
 import { getPlugs, createPlug, updatePlug, deletePlug } from "../api/plugs";
 import RoomFloorPlan from "../components/rooms/RoomFloorPlan";
+import { getRoomTint } from "../components/rooms/roomTheme";
 import PlugList from "../components/plugs/PlugList";
 import PlugForm from "../components/plugs/PlugForm";
 import Modal from "../components/common/Modal";
+import { IconArrowLeft, IconTrash, IconPlus } from "../components/common/Icons";
 import "./RoomDetailPage.css";
 
 export default function RoomDetailPage() {
@@ -97,29 +99,31 @@ export default function RoomDetailPage() {
   if (error) return <p className="room-detail__status room-detail__status--error">{error}</p>;
   if (!room) return null;
 
+  const tint = getRoomTint(room);
+
   return (
     <div className="room-detail">
       <Link to={`/inmueble/${inmuebleId}`} className="room-detail__back">
-        &larr; Todas las habitaciones
+        <IconArrowLeft width={15} height={15} /> Todas las habitaciones
       </Link>
 
       <div className="room-detail__header">
         <h1>{room.Name}</h1>
         <button type="button" className="btn btn-danger" onClick={handleDeleteRoom}>
-          Eliminar habitación
+          <IconTrash width={15} height={15} /> Eliminar habitación
         </button>
       </div>
 
       <div className="room-detail__content">
-        <div className="room-detail__plan">
-          <RoomFloorPlan plugs={plugs} colorSeed={room.ID} label={room.Name} />
+        <div className="room-detail__plan" style={{ background: `var(--floor-${tint})` }}>
+          <RoomFloorPlan plugs={plugs} room={room} label={room.Name} />
         </div>
 
         <div className="room-detail__plugs">
           <div className="room-detail__plugs-header">
             <h2>Servicios</h2>
             <button type="button" className="btn btn-primary" onClick={openCreateForm}>
-              + Añadir servicio
+              <IconPlus width={15} height={15} /> Añadir servicio
             </button>
           </div>
 

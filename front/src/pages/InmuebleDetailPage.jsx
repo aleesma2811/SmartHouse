@@ -3,10 +3,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getInmueble, updateInmueble, deleteInmueble } from "../api/inmuebles";
 import { getRooms, createRoom, deleteRoom } from "../api/rooms";
 import { getPlugs } from "../api/plugs";
-import RoomCard from "../components/rooms/RoomCard";
+import HouseFloorPlan from "../components/rooms/HouseFloorPlan";
 import RoomForm from "../components/rooms/RoomForm";
 import InmuebleForm from "../components/inmuebles/InmuebleForm";
 import Modal from "../components/common/Modal";
+import { IconArrowLeft, IconPencil, IconTrash, IconPlus } from "../components/common/Icons";
 import "./InmuebleDetailPage.css";
 
 const TIPO_LABEL = {
@@ -95,7 +96,7 @@ export default function InmuebleDetailPage() {
   return (
     <div className="inmueble-detail">
       <Link to="/" className="inmueble-detail__back">
-        &larr; Todos los inmuebles
+        <IconArrowLeft width={15} height={15} /> Todos los inmuebles
       </Link>
 
       <div className="inmueble-detail__header">
@@ -111,18 +112,18 @@ export default function InmuebleDetailPage() {
         </div>
         <div className="inmueble-detail__header-actions">
           <button type="button" className="btn btn-ghost" onClick={() => setShowEditInmueble(true)}>
-            Editar inmueble
+            <IconPencil width={15} height={15} /> Editar
           </button>
           <button type="button" className="btn btn-danger" onClick={handleDeleteInmueble}>
-            Eliminar inmueble
+            <IconTrash width={15} height={15} /> Eliminar
           </button>
         </div>
       </div>
 
       <div className="inmueble-detail__rooms-header">
-        <h2>Habitaciones</h2>
+        <h2>Planta del inmueble</h2>
         <button type="button" className="btn btn-primary" onClick={() => setShowForm(true)}>
-          + Nueva habitación
+          <IconPlus width={15} height={15} /> Nueva habitación
         </button>
       </div>
 
@@ -132,17 +133,14 @@ export default function InmuebleDetailPage() {
         </p>
       )}
 
-      <div className="inmueble-detail__grid">
-        {rooms.map((room) => (
-          <RoomCard
-            key={room.ID}
-            room={room}
-            plugs={plugs.filter((p) => p.RoomID === room.ID)}
-            onDelete={handleDeleteRoom}
-            linkTo={`/inmueble/${inmuebleId}/room/${room.ID}`}
-          />
-        ))}
-      </div>
+      {rooms.length > 0 && (
+        <HouseFloorPlan
+          rooms={rooms}
+          plugs={plugs}
+          inmuebleId={inmuebleId}
+          onDeleteRoom={handleDeleteRoom}
+        />
+      )}
 
       {showForm && (
         <Modal title="Nueva habitación" onClose={() => setShowForm(false)}>

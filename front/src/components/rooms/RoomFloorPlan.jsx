@@ -1,28 +1,37 @@
 import { PLAN, getPlugSlots } from "./floorPlanGeometry";
+import { getServiceMeta } from "../plugs/serviceTheme";
+import { getRoomTint } from "./roomTheme";
 import "./RoomFloorPlan.css";
 
-const FLOOR_TINTS = 6;
+function PlugMarker({ x, y, rotation, on, tipo }) {
+  const meta = getServiceMeta(tipo);
+  const Icon = meta.Icon;
 
-function PlugMarker({ x, y, rotation, on }) {
   return (
-    <g transform={`translate(${x} ${y}) rotate(${rotation})`}>
+    <g transform={`translate(${x} ${y})`}>
       <rect
-        x={-5}
-        y={-4}
-        width={10}
-        height={8}
-        rx={1.5}
-        className={on ? "floor-plan__plug floor-plan__plug--on" : "floor-plan__plug"}
+        x={-7}
+        y={-7}
+        width={14}
+        height={14}
+        rx={3.5}
+        transform={`rotate(${rotation})`}
+        className={on ? "floor-plan__plate floor-plan__plate--on" : "floor-plan__plate"}
+        style={on ? { fill: meta.soft, stroke: meta.color } : undefined}
       />
-      <line x1={-2} y1={-4} x2={-2} y2={-1.5} className="floor-plan__plug-prong" />
-      <line x1={2} y1={-4} x2={2} y2={-1.5} className="floor-plan__plug-prong" />
+      <g
+        transform="translate(-6 -6)"
+        style={{ color: on ? meta.color : "var(--color-wall)", opacity: on ? 1 : 0.7 }}
+      >
+        <Icon width={12} height={12} strokeWidth={2.4} />
+      </g>
     </g>
   );
 }
 
-export default function RoomFloorPlan({ plugs = [], colorSeed = 0, label }) {
+export default function RoomFloorPlan({ plugs = [], room, colorSeed = 0, label }) {
   const slots = getPlugSlots(plugs.length);
-  const floorClass = `floor-plan__floor floor-plan__floor--${colorSeed % FLOOR_TINTS}`;
+  const tint = getRoomTint(room ?? { ID: colorSeed });
 
   return (
     <svg
@@ -36,7 +45,8 @@ export default function RoomFloorPlan({ plugs = [], colorSeed = 0, label }) {
         y={PLAN.wallTop}
         width={PLAN.wallRight - PLAN.wallLeft}
         height={PLAN.wallBottom - PLAN.wallTop}
-        className={floorClass}
+        className="floor-plan__floor"
+        style={{ fill: `var(--floor-${tint})` }}
       />
 
       {/* Walls, drawn as individual segments so the door gap stays open */}
@@ -59,7 +69,14 @@ export default function RoomFloorPlan({ plugs = [], colorSeed = 0, label }) {
       />
 
       {slots.map((slot, i) => (
-        <PlugMarker key={i} x={slot.x} y={slot.y} rotation={slot.rotation} on={plugs[i]?.On} />
+        <PlugMarker
+          key={i}
+          x={slot.x}
+          y={slot.y}
+          rotation={slot.rotation}
+          on={plugs[i]?.On}
+          tipo={plugs[i]?.Tipo}
+        />
       ))}
     </svg>
   );

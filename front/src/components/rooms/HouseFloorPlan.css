@@ -1,0 +1,69 @@
+.house-plan {
+  background: var(--color-wall-dark);
+  border-radius: var(--radius-xl);
+  padding: 7px;
+  box-shadow: var(--shadow-md);
+}
+
+.house-plan__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 7px;
+}
+
+@media (min-width: 560px) {
+  .house-plan__room--big {
+    grid-column: span 2;
+  }
+}
+
+.house-plan__room {
+  position: relative;
+  min-width: 0;
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.house-plan__room:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(44, 36, 30, 0.22);
+  z-index: 1;
+}
+
+.house-plan__room-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.house-plan__room-plan {
+  padding: 0.6rem 0.6rem 0;
+}
+
+.house-plan__room-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.4rem 0.8rem 0.7rem;
+}
+
+.house-plan__room-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.house-plan__room-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.house-plan__room-delete {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  background: rgba(255, 253, 249, 0.75);
+  backdrop-filter: blur(2px);
+}

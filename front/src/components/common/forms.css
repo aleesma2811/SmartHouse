@@ -6,9 +6,11 @@
 }
 
 .field label {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .field input[type="text"],
@@ -20,6 +22,7 @@
   font-size: 0.95rem;
   color: var(--color-text);
   background: var(--color-bg);
+  font-family: var(--font-body);
 }
 
 .field input:focus,
@@ -42,22 +45,41 @@
 }
 
 .btn {
-  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1.5px solid transparent;
   border-radius: var(--radius-sm);
-  padding: 0.55rem 1rem;
-  font-size: 0.9rem;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.88rem;
   font-weight: 600;
+  font-family: var(--font-body);
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.1s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .btn-primary {
   background: var(--color-primary);
-  color: white;
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(22, 61, 63, 0.25);
 }
 
 .btn-primary:hover {
   background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(22, 61, 63, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(22, 61, 63, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-ghost {
@@ -67,7 +89,12 @@
 }
 
 .btn-ghost:hover {
-  background: var(--color-bg);
+  background: var(--color-surface-alt);
+  border-color: var(--color-wall);
+}
+
+.btn-ghost:active {
+  background: var(--color-border);
 }
 
 .btn-danger {
@@ -78,10 +105,45 @@
 
 .btn-danger:hover {
   background: var(--color-danger-soft);
+  border-color: var(--color-danger-soft);
+}
+
+.btn-danger:active {
+  background: var(--color-danger);
+  color: #fff;
 }
 
 .form-error {
   color: var(--color-danger);
   font-size: 0.85rem;
   margin-bottom: 0.75rem;
+}
+
+/* Shared small icon-only button, used for edit/delete affordances */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.icon-btn:hover {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+}
+
+.icon-btn--danger:hover {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
 }

@@ -1,15 +1,20 @@
 .header {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--color-primary);
   padding: 0.9rem 1.5rem;
 }
 
 .header__brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-weight: 700;
-  font-size: 1.1rem;
+  gap: 0.55rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
   text-decoration: none;
-  color: var(--color-text);
+  color: #fdf8ef;
+}
+
+.header__logo {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
 }
