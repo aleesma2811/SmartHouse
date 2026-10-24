@@ -1,3 +1,11 @@
+x-service-env: &service-env
+  POSTGRES_HOST: ${POSTGRES_HOST}
+  POSTGRES_USER: ${POSTGRES_USER}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_PORT: ${POSTGRES_PORT}
+  CONSUL_HTTP_ADDR: http://consul:8500
+
 services:
   front:
     build:
@@ -45,53 +53,62 @@ services:
       - inmuebles-1
       - inmuebles-2
 
+  consul:
+    image: hashicorp/consul:latest
+    command: "agent -dev -client=0.0.0.0 -ui"
+    ports:
+      - "8500:8500"
+
   back-1: &back-base
     build:
       context: ./back/
       dockerfile: Dockerfile
     environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      <<: *service-env
+      INSTANCE_ID: back-1
     depends_on:
       - "db"
+      - "consul"
 
   back-2:
     <<: *back-base
+    environment:
+      <<: *service-env
+      INSTANCE_ID: back-2
 
   servicios-1: &servicios-base
     build:
       context: ./servicios/
       dockerfile: Dockerfile
     environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      <<: *service-env
+      INSTANCE_ID: servicios-1
     depends_on:
       - "db"
+      - "consul"
 
   servicios-2:
     <<: *servicios-base
+    environment:
+      <<: *service-env
+      INSTANCE_ID: servicios-2
 
   inmuebles-1: &inmuebles-base
     build:
       context: ./inmuebles/
       dockerfile: Dockerfile
     environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_PORT: ${POSTGRES_PORT}
+      <<: *service-env
+      INSTANCE_ID: inmuebles-1
     depends_on:
       - "db"
+      - "consul"
 
   inmuebles-2: 
     <<: *inmuebles-base
+    environment:
+      <<: *service-env
+      INSTANCE_ID: inmuebles-2
 
   db:
     image: postgres:18.4-alpine3.24
