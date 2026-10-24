@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/inmuebles/db"
@@ -10,6 +12,22 @@ import (
 	"github.com/inmuebles/repository"
 	"github.com/inmuebles/routes"
 )
+
+func heartbeatHandler(w http.ResponseWriter, r *http.Request) {
+	sqlDB, err := db.DB.DB()
+	if err == nil {
+		// Si se obtuvo la conexión, hacer un ping a Posgres con límite de 2s
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+		err = sqlDB.PingContext(ctx)
+	}
+	if err != nil {
+		http.Error(w, "DB unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Back alive"))
+}
 
 func main() {
 	db.DBConnection()
@@ -23,6 +41,7 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", routes.HomeHandler)
+	r.HandleFunc("/heartbeat", heartbeatHandler).Methods("GET")
 
 	// Plugs routes
 	r.HandleFunc("/inmuebles", inmuebleHandler.GetInmueblesHandler).Methods("GET")
@@ -32,5 +51,5 @@ func main() {
 	r.HandleFunc("/inmuebles/{id}", inmuebleHandler.DeleteInmuebleHandler).Methods("DELETE")
 
 	log.Println("Servicio 'inmuebles' escuchando en :4002")
-	http.ListenAndServe(":4002", r)
+	serve(r, "inmuebles", 4002)
 }
