@@ -3,15 +3,22 @@ package main
 import (
 	"context"
 	"log"
+	"net"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/inmuebles/db"
+	"github.com/inmuebles/grpcserver"
 	"github.com/inmuebles/models"
+	"github.com/inmuebles/pb"
 	"github.com/inmuebles/repository"
 	"github.com/inmuebles/routes"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
+
+const grpcPort = ":5002"
 
 func heartbeatHandler(w http.ResponseWriter, r *http.Request) {
 	sqlDB, err := db.DB.DB()
@@ -37,6 +44,20 @@ func main() {
 	// Inyección de dependencias
 	inmuebleRepo := repository.NewInmuebleRepository(db.DB)
 	inmuebleHandler := routes.NewInmuebleHandler(inmuebleRepo)
+
+	lis, err := net.Listen("tcp", grpcPort)
+	if err != nil {
+		log.Fatalf("no se pudo abrir el puerto gRPC %s: %v", grpcPort, err)
+	}
+	grpcSrv := grpc.NewServer()
+	pb.RegisterInmuebleServiceServer(grpcSrv, grpcserver.NewInmuebleServer(inmuebleRepo))
+	reflection.Register(grpcSrv) // permite `grpcurl list` / `describe` sin el .proto
+	go func() {
+		log.Printf("gRPC (InmuebleService) escuchando en %s", grpcPort)
+		if err := grpcSrv.Serve(lis); err != nil {
+			log.Fatalf("servidor gRPC: %v", err)
+		}
+	}()
 
 	r := mux.NewRouter()
 
