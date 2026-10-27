@@ -2,15 +2,24 @@ package main
 
 import (
 	"context"
+	"log"
+	"net"
 	"net/http"
 	"time"
 
 	"github.com/back/db"
+	"github.com/back/grpcclient"
+	"github.com/back/grpcserver"
 	"github.com/back/models"
+	"github.com/back/pb"
 	"github.com/back/repository"
 	"github.com/back/routes"
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
+
+const grpcPort = ":5000"
 
 func heartbeatHandler(w http.ResponseWriter, r *http.Request) {
 	sqlDB, err := db.DB.DB()
@@ -37,6 +46,26 @@ func main() {
 	roomRepo := repository.NewRoomRepository(db.DB)
 	roomHandler := routes.NewRoomHandler(roomRepo)
 
+	lis, err := net.Listen("tcp", grpcPort)
+	if err != nil {
+		log.Fatalf("no se pudo abrir el puerto gRPC %s: %v", grpcPort, err)
+	}
+	grpcSrv := grpc.NewServer()
+	pb.RegisterRoomServiceServer(grpcSrv, grpcserver.NewRoomServer(roomRepo))
+	reflection.Register(grpcSrv) // permite `grpcurl list` / `describe` sin el .proto
+	go func() {
+		log.Printf("gRPC (RoomService) escuchando en %s", grpcPort)
+		if err := grpcSrv.Serve(lis); err != nil {
+			log.Fatalf("servidor gRPC: %v", err)
+		}
+	}()
+
+	inmuebleClient, err := grpcclient.NewInmuebleClient(envOr("INMUEBLES_GRPC_ADDR", "nginx:8001"))
+	if err != nil {
+		log.Fatalf("cliente gRPC de inmuebles: %v", err)
+	}
+	defer inmuebleClient.Close()
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", routes.HomeHandler)
@@ -45,7 +74,8 @@ func main() {
 	// Rooms routes
 	r.HandleFunc("/rooms", roomHandler.GetRoomsHandler).Methods("GET")
 	r.HandleFunc("/rooms/{id}", roomHandler.GetRoomHandler).Methods("GET")
-	r.HandleFunc("/rooms", roomHandler.PostRoomsHandler).Methods("POST")
+	// Antes de crear la room, valida por gRPC que el inmueble exista
+	r.HandleFunc("/rooms", validateInmueble(inmuebleClient, roomHandler.PostRoomsHandler)).Methods("POST")
 	r.HandleFunc("/rooms/{id}", roomHandler.DeleteRoomsHandler).Methods("DELETE")
 
 	// http.ListenAndServe(":4000", r)
