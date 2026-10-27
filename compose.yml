@@ -6,6 +6,14 @@ x-service-env: &service-env
   POSTGRES_PORT: ${POSTGRES_PORT}
   CONSUL_HTTP_ADDR: http://consul:8500
 
+x-back-env: &back-env
+  <<: *service-env
+  INMUEBLES_GRPC_ADDR: nginx:8001
+
+x-servicios-env: &servicios-env
+  <<: *service-env
+  ROOMS_GRPC_ADDR: nginx:8001
+
 services:
   front:
     build:
@@ -64,7 +72,7 @@ services:
       context: ./back/
       dockerfile: Dockerfile
     environment:
-      <<: *service-env
+      <<: *back-env
       INSTANCE_ID: back-1
     depends_on:
       - "db"
@@ -73,7 +81,7 @@ services:
   back-2:
     <<: *back-base
     environment:
-      <<: *service-env
+      <<: *back-env
       INSTANCE_ID: back-2
 
   servicios-1: &servicios-base
@@ -81,7 +89,7 @@ services:
       context: ./servicios/
       dockerfile: Dockerfile
     environment:
-      <<: *service-env
+      <<: *servicios-env
       INSTANCE_ID: servicios-1
     depends_on:
       - "db"
@@ -90,7 +98,7 @@ services:
   servicios-2:
     <<: *servicios-base
     environment:
-      <<: *service-env
+      <<: *servicios-env
       INSTANCE_ID: servicios-2
 
   inmuebles-1: &inmuebles-base
