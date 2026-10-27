@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package smarthouse;
+
+// Paquete Go generado se llama "pb" (después del ;pb)
+option go_package = "github.com/smarthouse/pb;pb";
+
+// gRPC: 5002
+service InmuebleService {
+  rpc GetInmueble(GetInmuebleRequest) returns (Inmueble);
+  rpc ListInmuebles(ListInmueblesRequest) returns (ListInmueblesResponse);
+  rpc InmuebleExists(GetInmuebleRequest) returns (ExistsResponse);
+}
+
+// gRPC: 5000
+service RoomService {
+  rpc GetRoom(GetRoomRequest) returns (Room);
+  rpc ListRooms(ListRoomsRequest) returns (ListRoomsResponse);
+  rpc RoomExists(GetRoomRequest) returns (ExistsResponse);
+}
+
+// gRPC: 5001
+service ServicioService {
+  rpc GetServicio(GetServicioRequest) returns (Servicio);
+  rpc ListServicios(ListServiciosRequest) returns (ListServiciosResponse);
+  rpc ServicioExists(GetServicioRequest) returns (ExistsResponse);
+}
+
+message ExistsResponse {
+  bool exists = 1;
+}
+
+// INMUEBLE
+message Inmueble {
+  uint32 id = 1;
+  string nombre = 2;
+  string direccion = 3;
+  string ciudad = 4;
+  string tipo = 5;
+}
+
+message GetInmuebleRequest {
+  uint32 id = 1;
+}
+message ListInmueblesRequest {}
+
+message ListInmueblesResponse {
+  repeated Inmueble inmuebles = 1;
+}
+
+// ROOM
+message Room {
+  uint32 id = 1;
+  string name = 2;
+  uint32 inmueble_id = 3;
+}
+
+message GetRoomRequest {
+  uint32 id = 1;
+}
+
+message ListRoomsRequest {
+  uint32 inmueble_id = 1; // 0 = todos
+}
+
+message ListRoomsResponse {
+  repeated Room rooms = 1;
+}
+
+// SERVICES
+message Servicio {
+  uint32 id = 1;
+  string name = 2;
+  string tipo = 3;
+  float consumo = 4;
+  uint32 room_id = 5;
+  bool on = 6;
+}
+
+message GetServicioRequest {
+  uint32 id = 1;
+}
+
+message ListServiciosRequest {
+  uint32 room_id = 1; // 0 = todos
+}
+
+message ListServiciosResponse {
+  repeated Servicio servicios = 1;
+}
