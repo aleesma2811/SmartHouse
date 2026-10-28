@@ -2,20 +2,27 @@ package routes
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"strconv"
+	"time"
 
+	"github.com/back/events"
+	"github.com/back/kafkax"
 	"github.com/back/models"
 	"github.com/back/repository"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
 type RoomHandler struct {
-	repo repository.RoomRepository
+	repo   repository.RoomRepository
+	events *kafkax.Publisher
 }
 
 // Función constructora
-func NewRoomHandler(repo repository.RoomRepository) *RoomHandler {
-	return &RoomHandler{repo: repo}
+func NewRoomHandler(repo repository.RoomRepository, events *kafkax.Publisher) *RoomHandler {
+	return &RoomHandler{repo: repo, events: events}
 }
 
 func (h *RoomHandler) GetRoomsHandler(w http.ResponseWriter, r *http.Request) {
@@ -69,8 +76,9 @@ func (h *RoomHandler) PostRoomsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *RoomHandler) DeleteRoomsHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	// Verificar que el room exista
-	if _, err := h.repo.GetByID(params["id"]); err != nil {
+	// Verificar que el room exista (el evento necesita sus IDs)
+	room, err := h.repo.GetByID(params["id"])
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound) // Error 404
 		w.Write([]byte("Room not found"))
 		return
@@ -79,6 +87,19 @@ func (h *RoomHandler) DeleteRoomsHandler(w http.ResponseWriter, r *http.Request)
 	if err := h.repo.Delete(params["id"]); err != nil {
 		w.WriteHeader(http.StatusInternalServerError) // Error 500
 		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// Avisa a servicios para que borre los servicios de la habitación
+	evt := events.RoomDeleted{
+		EventID:    uuid.NewString(),
+		RoomID:     room.ID,
+		InmuebleID: room.InmuebleID,
+		DeletedAt:  time.Now().UTC(),
+	}
+	key := strconv.FormatUint(uint64(room.InmuebleID), 10)
+	if err := h.events.Publish(r.Context(), key, events.TypeRoomDeleted, evt); err != nil {
+		log.Printf("no se pudo publicar %s de la habitación %d: %v", events.TypeRoomDeleted, room.ID, err)
 	}
 
 	w.WriteHeader(http.StatusOK)

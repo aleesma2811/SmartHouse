@@ -8,8 +8,10 @@ import (
 	"time"
 
 	"github.com/back/db"
+	"github.com/back/events"
 	"github.com/back/grpcclient"
 	"github.com/back/grpcserver"
+	"github.com/back/kafkax"
 	"github.com/back/models"
 	"github.com/back/pb"
 	"github.com/back/repository"
@@ -42,9 +44,26 @@ func main() {
 
 	db.DB.AutoMigrate(models.Room{})
 
+	// Kafka
+	// Back publica en rooms.events y onsume inmuebles.events
+	kafkaBroker := envOr("KAFKA_BROKER", "kafka:9092")
+	brokers := []string{kafkaBroker}
+	for _, topic := range []string{events.TopicInmuebles, events.TopicRooms} {
+		if err := kafkax.EnsureTopic(kafkaBroker, topic, 3); err != nil {
+			log.Fatalf("kafka: no se pudo crear el tópico %s: %v", topic, err)
+		}
+	}
+	roomEvents := kafkax.NewPublisher(brokers, events.TopicRooms)
+	defer roomEvents.Close()
+
 	// Inyección de dependencias
 	roomRepo := repository.NewRoomRepository(db.DB)
-	roomHandler := routes.NewRoomHandler(roomRepo)
+	roomHandler := routes.NewRoomHandler(roomRepo, roomEvents)
+
+	// Consumidor de inmuebles.events: borra habitaciones y publica room.deleted
+	kafkaCtx, stopKafka := context.WithCancel(context.Background())
+	defer stopKafka()
+	go consumeInmueblesEvents(kafkaCtx, brokers, roomRepo, roomEvents)
 
 	lis, err := net.Listen("tcp", grpcPort)
 	if err != nil {
