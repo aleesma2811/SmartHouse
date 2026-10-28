@@ -2,19 +2,25 @@ package routes
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/inmuebles/events"
+	"github.com/inmuebles/kafkax"
 	"github.com/inmuebles/models"
 	"github.com/inmuebles/repository"
 )
 
 type InmuebleHandler struct {
-	repo repository.InmuebleRepository
+	repo   repository.InmuebleRepository
+	events *kafkax.Publisher
 }
 
-func NewInmuebleHandler(repo repository.InmuebleRepository) *InmuebleHandler {
-	return &InmuebleHandler{repo: repo}
+func NewInmuebleHandler(repo repository.InmuebleRepository, events *kafkax.Publisher) *InmuebleHandler {
+	return &InmuebleHandler{repo: repo, events: events}
 }
 
 func tipoValidado(tipo string) bool {
@@ -103,7 +109,10 @@ func (h *InmuebleHandler) UpdateInmueble(w http.ResponseWriter, r *http.Request)
 func (h *InmuebleHandler) DeleteInmuebleHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	if _, err := h.repo.GetByID(params["id"]); err != nil {
+	// Evento necesita el ID
+	inmueble, err := h.repo.GetByID(params["id"])
+
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(err.Error()))
 		return
@@ -113,6 +122,18 @@ func (h *InmuebleHandler) DeleteInmuebleHandler(w http.ResponseWriter, r *http.R
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
+	}
+
+	// Crea el evento y genera el ID del evento
+	// Kafka avisa que inmueble fue borrado, back reacciona eliminando todas las habitaciones
+	evt := events.InmuebleDeleted{
+		EventID:    uuid.NewString(),
+		InmuebleID: inmueble.ID,
+		DeletedAt:  time.Now().UTC(),
+	}
+
+	if err := h.events.Publish(r.Context(), params["id"], events.TypeInmuebleDeleted, evt); err != nil {
+		log.Printf("no se pudo publicar %s del inmueble %d: %v", events.TypeInmuebleDeleted, inmueble.ID, err)
 	}
 
 	w.WriteHeader(http.StatusOK)
