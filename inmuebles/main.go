@@ -5,11 +5,14 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/inmuebles/db"
+	"github.com/inmuebles/events"
 	"github.com/inmuebles/grpcserver"
+	"github.com/inmuebles/kafkax"
 	"github.com/inmuebles/models"
 	"github.com/inmuebles/pb"
 	"github.com/inmuebles/repository"
@@ -19,6 +22,13 @@ import (
 )
 
 const grpcPort = ":5002"
+
+func envOr(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
 
 func heartbeatHandler(w http.ResponseWriter, r *http.Request) {
 	sqlDB, err := db.DB.DB()
@@ -43,7 +53,15 @@ func main() {
 
 	// Inyección de dependencias
 	inmuebleRepo := repository.NewInmuebleRepository(db.DB)
-	inmuebleHandler := routes.NewInmuebleHandler(inmuebleRepo)
+
+	kafkaBroker := envOr("KAFKA_BROKER", "kafka:9092")
+	if err := kafkax.EnsureTopic(kafkaBroker, events.TopicInmuebles, 3); err != nil {
+		log.Fatalf("kafka: no se pudo crear el tópico %s: %v", events.TopicInmuebles, err)
+	}
+	inmuebleEvents := kafkax.NewPublisher([]string{kafkaBroker}, events.TopicInmuebles)
+	defer inmuebleEvents.Close()
+
+	inmuebleHandler := routes.NewInmuebleHandler(inmuebleRepo, inmuebleEvents)
 
 	lis, err := net.Listen("tcp", grpcPort)
 	if err != nil {
