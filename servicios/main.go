@@ -9,8 +9,10 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/servicios/db"
+	"github.com/servicios/events"
 	"github.com/servicios/grpcclient"
 	"github.com/servicios/grpcserver"
+	"github.com/servicios/kafkax"
 	"github.com/servicios/models"
 	"github.com/servicios/pb"
 	"github.com/servicios/repository"
@@ -45,6 +47,15 @@ func main() {
 	// Inyección de dependencias
 	servicioRepo := repository.NewServicioRepository(db.DB)
 	servicioHandler := routes.NewServicioHandler(servicioRepo)
+
+	// Kafka
+	kafkaBroker := envOr("KAFKA_BROKER", "kafka:9092")
+	if err := kafkax.EnsureTopic(kafkaBroker, events.TopicRooms, 3); err != nil {
+		log.Fatalf("kafka: no se pudo crear el tópico %s: %v", events.TopicRooms, err)
+	}
+	kafkaCtx, stopKafka := context.WithCancel(context.Background())
+	defer stopKafka()
+	go consumeRoomEvents(kafkaCtx, []string{kafkaBroker}, servicioRepo)
 
 	lis, err := net.Listen("tcp", grpcPort)
 	if err != nil {
