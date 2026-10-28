@@ -5,6 +5,7 @@ x-service-env: &service-env
   POSTGRES_DB: ${POSTGRES_DB}
   POSTGRES_PORT: ${POSTGRES_PORT}
   CONSUL_HTTP_ADDR: http://consul:8500
+  KAFKA_BROKER: kafka:9092
 
 x-back-env: &back-env
   <<: *service-env
@@ -67,6 +68,22 @@ services:
     ports:
       - "8500:8500"
 
+  kafka:
+    image: apache/kafka:3.8.0
+    container_name: kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
   back-1: &back-base
     build:
       context: ./back/
@@ -77,6 +94,7 @@ services:
     depends_on:
       - "db"
       - "consul"
+      - "kafka"
 
   back-2:
     <<: *back-base
@@ -94,6 +112,7 @@ services:
     depends_on:
       - "db"
       - "consul"
+      - "kafka"
 
   servicios-2:
     <<: *servicios-base
@@ -111,6 +130,7 @@ services:
     depends_on:
       - "db"
       - "consul"
+      - "kafka"
 
   inmuebles-2: 
     <<: *inmuebles-base
