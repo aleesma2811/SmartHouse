@@ -43,7 +43,7 @@ func heartbeatHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Back alive"))
+	w.Write([]byte("Inmuebles alive"))
 }
 
 func main() {

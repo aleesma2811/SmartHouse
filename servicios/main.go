@@ -36,13 +36,13 @@ func heartbeatHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Back alive"))
+	w.Write([]byte("Servicios alive"))
 }
 
 func main() {
 	db.DBConnection()
 
-	db.DB.AutoMigrate(models.Servicio{})
+	db.DB.AutoMigrate(models.Servicio{}, models.Lectura{})
 
 	// Inyección de dependencias
 	servicioRepo := repository.NewServicioRepository(db.DB)
