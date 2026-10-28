@@ -11,9 +11,12 @@ const (
 
 type Servicio struct {
 	gorm.Model
-	Name    string
-	Tipo    string
+	Name string
+	Tipo string
+	// Consumo por hora
 	Consumo float32 // kWh (luz), litros (agua), m3 (gas)
 	RoomID  uint
 	On      bool `gorm:"default:false"`
+	// Float64 porque suma varios float32
+	ConsumoTotal float64 `gorm:"default:0"`
 }
