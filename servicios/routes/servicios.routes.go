@@ -77,6 +77,7 @@ func (h *ServicioHandler) PostServiciosHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 	json.NewEncoder(w).Encode(&servicio)
+	servicio.ConsumoTotal = 0
 }
 
 func (h *ServicioHandler) UpdateServicioHandler(w http.ResponseWriter, r *http.Request) {
